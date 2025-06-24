@@ -1,3 +1,33 @@
+# Исключаем системные файлы и кэш
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.DS_Store
+
+# Исключаем файлы IDE и редакторов
+.vscode/
+.idea/
+
+# Исключаем виртуальные окружения
+venv/
+env/
+.env
+
+# Исключаем зависимости Python, установленные локально
+/build/
+/dist/
+*.egg-info
+
+# Исключаем Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# --- САМОЕ ВАЖНОЕ ---
+# Исключаем папку с данными. Данные и модели не хранятся в Git!
+data/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

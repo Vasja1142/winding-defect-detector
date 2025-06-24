@@ -1,0 +1,11 @@
+ultralytics
+torch
+torchvision
+torchaudio
+opencv-python-headless
+numpy
+pyyaml
+tqdm
+albumentations
+Unidecode 
+Flask

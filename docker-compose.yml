@@ -1,0 +1,21 @@
+
+services:
+  detector:
+    build: .
+    container_name: defect_detector_app
+    ports:
+      - "5000:5000" # <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml
+    shm_size: '4g'
+  
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: tail -f /dev/null
