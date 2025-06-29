@@ -9,6 +9,8 @@ services:
       - ./src:/app/src
       - ./data:/app/data
       - ./config.yaml:/app/config.yaml
+      - ./custom_augment.yaml:/app/custom_augment.yaml
+      - ./config_smart_merge.yaml:/app/config_smart_merge.yaml 
     shm_size: '4g'
   
     deploy:

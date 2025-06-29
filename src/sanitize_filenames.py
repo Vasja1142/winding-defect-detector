@@ -1,45 +1,51 @@
-# src/sanitize_filenames.py
-
+# src/sanitize_filenames.py (ПРАВИЛЬНАЯ, УНИВЕРСАЛЬНАЯ ВЕРСИЯ)
 import os
 import argparse
 from unidecode import unidecode
-from tqdm import tqdm
+import re
+import sys
 
-def sanitize(filename):
-    """Преобразует имя файла в 'безопасный' ASCII формат."""
-    # Транслитерируем с помощью Unidecode
-    safe_name = unidecode(filename)
-    # Заменяем пробелы и другие нежелательные символы на '_'
-    safe_name = safe_name.replace(' ', '_').replace('-', '_').replace(':', '_')
-    return safe_name
-
-def process_directory(directory_path):
-    """Переименовывает все файлы в указанной директории."""
-    if not os.path.isdir(directory_path):
-        print(f"Директория не найдена: {directory_path}")
-        return
-        
-    print(f"Обработка директории: {directory_path}")
-    # Мы читаем список файлов один раз, чтобы избежать проблем при переименовании
-    filenames = os.listdir(directory_path)
-    for filename in tqdm(filenames):
-        old_path = os.path.join(directory_path, filename)
-        # Проверяем, что это файл, а не папка
-        if os.path.isfile(old_path):
-            new_filename = sanitize(filename)
-            new_path = os.path.join(directory_path, new_filename)
-            
-            if old_path != new_path:
-                os.rename(old_path, new_path)
+def sanitize_name(filename):
+    """Приводит имя файла к безопасному формату: латиница, нижний регистр, с подчеркиваниями вместо пробелов."""
+    base_name, extension = os.path.splitext(filename)
+    
+    # Транслитерация, нижний регистр, замена не-букв/цифр на подчеркивание
+    sanitized_base = unidecode(base_name).lower()
+    sanitized_base = re.sub(r'[\s\W]+', '_', sanitized_base).strip('_')
+    sanitized_base = re.sub(r'__+', '_', sanitized_base)
+    
+    # Расширение тоже приводим к нижнему регистру
+    sanitized_ext = extension.lower()
+    
+    return f"{sanitized_base}{sanitized_ext}"
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Санитайзер имен файлов в датасете.")
-    parser.add_argument('--input_dir', type=str, required=True, help='Папка с распакованными данными (например, temp_cvat_export).')
-    
+    parser = argparse.ArgumentParser(description="Универсальный санитайзер имен файлов в директории.")
+    parser.add_argument('--input_dir', required=True, type=str, help='Директория, в которой нужно переименовать файлы.')
     args = parser.parse_args()
+
+    if not os.path.isdir(args.input_dir):
+        print(f"[ОШИБКА] Директория не найдена: {args.input_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Сканирование директории для санитарной обработки: {args.input_dir}")
     
-    # Обрабатываем папки images и labels
-    process_directory(os.path.join(args.input_dir, 'images'))
-    process_directory(os.path.join(args.input_dir, 'labels'))
-    
-    print("Санитарная обработка имен файлов завершена!")
+    # Получаем список файлов ПЕРЕД переименованием
+    for filename in os.listdir(args.input_dir):
+        original_path = os.path.join(args.input_dir, filename)
+        
+        # Пропускаем папки, если они вдруг есть
+        if os.path.isdir(original_path):
+            continue
+            
+        sanitized_filename = sanitize_name(filename)
+        
+        if filename != sanitized_filename:
+            new_path = os.path.join(args.input_dir, sanitized_filename)
+            try:
+                os.rename(original_path, new_path)
+                print(f"  -> Переименовано: '{filename}' -> '{sanitized_filename}'")
+            except OSError as e:
+                print(f"[ОШИБКА] не удалось переименовать '{filename}': {e}", file=sys.stderr)
+        
+    print("\nСанитарная обработка имен файлов завершена!")
