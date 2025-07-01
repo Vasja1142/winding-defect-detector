@@ -1,14 +1,7 @@
-# config.yaml (МНОГОКЛАССОВАЯ ВЕРСИЯ)
-path: /app/data/03_annotated
-
+# path: /app/data/03_annotated_smart_merge
+path: /app/data/04_datasets
 train: train/images
 val: valid/images
-# Задаем имена для всех 5 классов
-# Порядок должен СТРОГО соответствовать файлу obj.names
-# и, соответственно, индексам в ваших .txt файлах разметки
 names:
-  0: potential_defect
-  1: overlap
-  2: row_gap
-  3: debris 
-  4: section_shift
+  0: row_gap
+  1: defect

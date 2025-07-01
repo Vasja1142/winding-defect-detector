@@ -1,7 +1,0 @@
-# path: /app/data/03_annotated_smart_merge
-path: /app/data/03_annotated_smart_merge_aug
-train: train/images
-val: valid/images
-names:
-  0: row_gap
-  1: defect

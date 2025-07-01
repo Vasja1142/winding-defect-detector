@@ -4,15 +4,14 @@ services:
     build: .
     container_name: defect_detector_app
     ports:
-      - "5000:5000" # <--- ДОБАВЬТЕ ЭТУ СТРОКУ
+      - "5000:5000"
     volumes:
       - ./src:/app/src
       - ./data:/app/data
       - ./config.yaml:/app/config.yaml
-      - ./custom_augment.yaml:/app/custom_augment.yaml
-      - ./config_smart_merge.yaml:/app/config_smart_merge.yaml 
+      # Связываем том с данными MLflow, чтобы детектор мог сохранять артефакты
+      - mlflow-data:/mlflow 
     shm_size: '4g'
-  
     deploy:
       resources:
         reservations:
@@ -20,4 +19,26 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    # Зависит от сервиса mlflow, чтобы он запустился первым
+    depends_on:
+      - mlflow-server
     command: tail -f /dev/null
+
+  mlflow-server:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow_server
+    ports:
+      - "5001:5000" # Веб-интерфейс будет доступен на http://localhost:5001
+    volumes:
+      - mlflow-data:/mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri /mlflow
+      --default-artifact-root /mlflow
+    restart: always
+
+volumes:
+  mlflow-data:
+    driver: local

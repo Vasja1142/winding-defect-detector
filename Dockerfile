@@ -23,6 +23,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./src ./src
 COPY ./config.yaml .
 
-COPY ./data/01_raw/source_video.mp4 /app/test_video.mp4
+# COPY ./data/01_raw/source_video.mp4 /app/test_video.mp4
 # Команда по умолчанию при запуске контейнера
 CMD ["python", "src/inference.py"]
