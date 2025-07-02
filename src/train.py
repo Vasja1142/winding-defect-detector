@@ -38,10 +38,15 @@ if __name__ == '__main__':
     parser.add_argument('--perspective', type=float, default=0.0, help='Коэффициент перспективных искажений.')
     
     # Параметры оптимизатора
-    parser.add_argument('--optimizer', type=str, default='auto', help='Оптимизатор (SGD, Adam, etc.).')
+    parser.add_argument('--optimizer', type=str, help='Оптимизатор (SGD, Adam, etc.).')
     parser.add_argument('--cos_lr', action='store_true', help='Использовать косинусный планировщик скорости обучения.')
     parser.add_argument('--weight_decay', type=float, default=0.0005, help='Коэффициент затухания весов (регуляризация).')
     parser.add_argument('--mixup', type=float, default=0.0, help='Вероятность применения аугментации MixUp.')
+    parser.add_argument('--patience', type=int, default=50, help='Количество эпох без улучшения для ранней остановки.')
+    parser.add_argument('--label_smoothing', type=float, default=0.0, help='Коэффициент сглаживания меток (label smoothing).')
+    parser.add_argument('--lr0', type=float, default=0.01, help='Начальная скорость обучения (initial learning rate).')
+    parser.add_argument('--lrf', type=float, default=0.01, help='Финальная скорость обучения (Final One-Cycle-LR learning rate).')
+    parser.add_argument('--cache', type=str, default='False', help='Кэшировать изображения для ускорения обучения (True/False/disk).')
 
     args = parser.parse_args()
     
@@ -56,7 +61,7 @@ if __name__ == '__main__':
         print(f"MLflow Run ID: {run.info.run_id}")
         mlflow.log_params(vars(args))
         
-        # Загружаем модель
+        # Заг��ужаем модель
         model = YOLO(args.model)
         
         # Запускаем обучение
@@ -84,7 +89,12 @@ if __name__ == '__main__':
             optimizer=args.optimizer,
             cos_lr=args.cos_lr,
             weight_decay=args.weight_decay,
-            mixup=args.mixup
+            mixup=args.mixup,
+            patience=args.patience,
+            label_smoothing=args.label_smoothing,
+            lr0=args.lr0,
+            lrf=args.lrf,
+            cache=args.cache
         )
         
         # --- ЛОГИРОВАНИЕ АРТЕФАКТОВ ---
