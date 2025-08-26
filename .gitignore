@@ -25,8 +25,11 @@ env/
 
 # --- САМОЕ ВАЖНОЕ ---
 # Исключаем папку с данными. Данные и модели не хранятся в Git!
-data/
-
+data/*
+# Но не игнорировать папку data/05_runs
+!data/05_runs/
+# Важно: также не игнорировать содержимое папки data/05_runs
+!data/05_runs/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
